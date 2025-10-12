@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -32,6 +33,12 @@ class Main extends Controller
         /* $users = DB::table('users')->get()->toArray();
         dd($users); */
 
-        
+        /* Eloquent ORM */
+        $model = new UserModel();
+        $users = $model->all();
+
+        foreach($users as $user){
+            echo $user->username . '<br>';
+        }
     }
 }
