@@ -30,7 +30,8 @@ class Main extends Controller
         $data = [
             'title' => $this->title
         ];
-        return 'ok';
+        session()->put('username', 'admin');
+        echo 'logado';
     }
 
     public function main(){
@@ -39,5 +40,10 @@ class Main extends Controller
         ];
 
         return view('main', $data);
+    }
+
+    public function logout(){
+        session()->forget('username');
+        return redirect()->route('login');
     }
 }

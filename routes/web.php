@@ -4,13 +4,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Main;
 
-Route::get('/', [Main::class, 'index'])->name('index');
+Route::middleware('CheckLogout')->group(function () {
+    Route::get('/login', [Main::class, 'login'])->name('login');
+    Route::post('/login_submit', [Main::class, 'login_submit'])->name('login_submit');
+});
 
-// login routes
-
-Route::get('/login', [Main::class, 'login'])->name('login');
-Route::post('/login_submit', [Main::class, 'login_submit'])->name('login_submit');
-
-// main page
-
-Route::get('/main', [Main::class, 'main'])->name('main');
+Route::middleware('CheckLogin')->group(function () {
+    Route::get('/', [Main::class, 'index'])->name('index');
+    Route::get('/main', [Main::class, 'main'])->name('main');
+    Route::get('/logout', [Main::class, 'logout'])->name('logout');
+});
