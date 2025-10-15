@@ -29,9 +29,43 @@ class Main extends Controller
         return view('login_frm', $data);
     }
 
-    public function login_submit()
+    public function login_submit(Request $request)
     {
-        // submit
+        $request->validate([
+            'text_username' => 'required|min:3',
+            'text_password' => 'required|min:3'
+        ], [
+            'text_username.required' => 'O campo é obrigatório',
+            'text_password.required' => 'O campo é obrigatório',
+            'text_username.min' => 'O campo deve conter no mínimo 3 caracteres',
+            'text_password.min' => 'O campo deve conter no mínimo 3 caracteres'
+        ]);
+
+        $username = $request->input('text_username');
+        $password = $request->input('text_password');
+
+        $model = new UserModel();
+        $user = $model->where('username', '=', $username)
+        ->whereNull('deleted_at')
+        ->first();
+
+        if($user){
+
+            // verifiy the password
+            if(password_verify($password, $user->password)){
+                $session_data = [
+                    'id' => $user->id,
+                    'username' => $user->username
+                ];
+
+                session()->put($session_data);
+
+                redirect()->route('index');
+
+            }
+        }
+
+        return redirect()->route('login')->with('login_error', 'Login inválido');
     }
 
     public function logout(){
