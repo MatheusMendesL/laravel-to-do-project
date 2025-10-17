@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TaskModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class Main extends Controller
 {
@@ -14,7 +14,8 @@ class Main extends Controller
     public function index()
     {
         $data = [
-            'title' => 'Gestor de tarefas'
+            'title' => 'Gestor de tarefas',
+            'tasks' => $this->_get_tasks()
         ];
 
         return view('main', $data);
@@ -71,5 +72,26 @@ class Main extends Controller
     public function logout(){
         session()->forget('username');
         return redirect()->route('login');
+    }
+
+    public function new_task(){
+        $data = [
+            'title' => $this->title
+        ];
+
+        return view('new_task_frm', $data);
+    }
+
+    public function new_task_submit(){
+        echo 'teste';
+    }
+
+    // private methods
+
+    private function _get_tasks(){
+        $model = new TaskModel();
+        return $model->where('id_user', '=', session()->get('id'))
+        ->whereNull('deleted_at')
+        ->get();
     }
 }

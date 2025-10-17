@@ -5,7 +5,8 @@
                 <h3 class="text-primary">{{ $title }}</h3>
             </div>
             <div class="col p-3 text-end">
-                 {{session()->get('username')}} <button class="btn btn-outline-danger mx-3" onclick="window.location.href='/logout'">Sair</button>
+                 <i class="bi bi-person me-2"></i><span class="me-3">{{session()->get('username')}} </span>
+                 <a href="{{ route('logout') }}" class="btn btn-outline-danger"><i class="bi bi-box-arrow-right me-2"></i>Sair</a>
             </div>
         </div>
     </div>
