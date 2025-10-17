@@ -14,7 +14,7 @@
                     <label for="text_task_name" class="form-label">Nome da tarefa</label>
                     <input type="text" name="text_task_name" id="text_task_name" class="form-control" placeholder="Nome da tarefa" required value="{{old('text_task_name')}}">
                     @error('text_task_name')
-                        <div class="text-warning">
+                        <div class="text-danger">
                             {{ $errors->get('text_task_name')[0] }}
                         </div>
                     @enderror
@@ -22,9 +22,9 @@
 
                 <div class="mb-3">
                     <label for="text_task_description" class="form-label">Descrição da tarefa</label>
-                    <textarea name="text_task_description" id="text_task_description" class="form-control" cols="30" rows="5" value="{{ old('text_task_description') }}"></textarea>
+                    <textarea name="text_task_description" id="text_task_description" class="form-control" cols="30" rows="5" value="{{ old('text_task_description') }}" required></textarea>
                     @error('text_task_description')
-                        <div class="text-warning">
+                        <div class="text-danger">
                             {{ $errors->get('text_task_description')[0] }}
                         </div>
                     @enderror
@@ -32,13 +32,13 @@
 
                 <div class="mb-3 text-center">
                     <a href="{{ route('index') }}" class="btn btn-dark px-5"><i class="bi bi-x-circle me-2"></i> Voltar</a>
-                    <button type="submit" class="btn btn-secondary px-5 m-1"><i class="bi bi-floppy me-e"></i>Salvar</button>
+                    <button type="submit" class="btn btn-secondary px-5 m-1"><i class="bi bi-floppy me-2"></i> Salvar</button>
                 </div>
             </form>
 
              @if(session()->has('task_error'))
                 <div class="alert alert-danger text-center p-1">
-                    {{ session()->get('login_error') }}
+                    {{ session()->get('task_error') }}
                 </div>
             @endif
 
