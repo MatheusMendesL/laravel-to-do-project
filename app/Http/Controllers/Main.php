@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TaskModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 
 class Main extends Controller
 {
@@ -14,7 +15,7 @@ class Main extends Controller
     public function index()
     {
         $data = [
-            'title' => 'Gestor de tarefas',
+            'title' => 'Gestor de Tarefas',
             'datatables' => true,
             'tasks' => $this->_get_tasks(),
         ];
@@ -124,6 +125,34 @@ class Main extends Controller
         return redirect()->route('index');
     }
 
+    public function edit_task($id) {
+        try{
+            $id = Crypt::decrypt($id);
+        }catch(\Exception $error){
+            return redirect()->route('index');
+        }
+
+        $model = new TaskModel();
+        $task = $model->where('id', '=', $id)->first();
+
+        if(empty($task)){
+            return redirect()->route('index');
+        }
+
+        $data = [
+            'title' => $this->title,
+            'task' => $task
+        ];
+
+        return view('edit_task_frm', $data);
+    }
+
+    public function edit_task_submit(Request $request) {
+        echo '<pre>';
+        print_r($request->all());
+    }
+
+
     // private methods
 
     private function _get_tasks()
@@ -136,8 +165,8 @@ class Main extends Controller
         $collection = [];
         foreach ($tasks as $task) {
 
-            $link_edit = '<a href="' . route('edit_task', ['id' => $task->id]) . '" class="btn btn-secondary m-1"><i class="bi bi-pencil-square"></i></a>';
-            $link_delete = '<a href="' . route('delete_task', ['id' => $task->id]) . '" class="btn btn-danger"><i class="bi bi-trash"></i></a>';
+            $link_edit = '<a href="' . route('edit_task', ['id' => Crypt::encrypt($task->id)]) . '" class="btn btn-secondary m-1"><i class="bi bi-pencil-square"></i></a>';
+            $link_delete = '<a href="' . route('delete_task', ['id' => Crypt::encrypt($task->id)]) . '" class="btn btn-danger"><i class="bi bi-trash"></i></a>';
 
             $collection[] = [
                 'task_name' => $task->task_name,
@@ -153,15 +182,17 @@ class Main extends Controller
     {
         $status_collection = [
             'new' => 'Nova',
-            'in_progress', 'Em progresso',
-            'cancelled', 'Cancelada',
-            'completed', 'Concluída'
+            'in_progress',
+            'Em progresso',
+            'cancelled',
+            'Cancelada',
+            'completed',
+            'Concluída'
         ];
 
 
-        if(key_exists($status, $status_collection)){
+        if (key_exists($status, $status_collection)) {
             return $status_collection[$status];
         }
-        
     }
 }
