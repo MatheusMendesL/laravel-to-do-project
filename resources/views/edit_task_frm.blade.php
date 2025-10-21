@@ -36,17 +36,22 @@
                         <label for="text_task_status" class="form-label">Status da tarefa</label>
                         <select name="text_task_status" id="text_task_status" class="form-select w-25">
                             <option value="new"
-                                {{ old('text_task_status', $task->task_status == 'new' ? 'select' : '') }}>Nova</option>
+                                {{ old('text_task_status', $task->task_status == 'new' ? 'selected' : '') }}>Nova</option>
                             <option value="in_progress"
-                                {{ old('text_task_status', $task->task_status == 'in_progress' ? 'select' : '') }}>Em
+                                {{ old('text_task_status', $task->task_status == 'in_progress' ? 'selected' : '') }}>Em
                                 progresso</option>
                             <option value="cancelled"
-                                {{ old('text_task_status', $task->task_status == 'cancelled' ? 'select' : '') }}>Cancelada
+                                {{ old('text_task_status', $task->task_status == 'cancelled' ? 'selected' : '') }}>Cancelada
                             </option>
                             <option value="completed"
-                                {{ old('text_task_status', $task->task_status == 'completed' ? 'select' : '') }}>Concluída
+                                {{ old('text_task_status', $task->task_status == 'completed' ? 'selected' : '') }}>Concluída
                             </option>
                         </select>
+                        @error('text_task_status')
+                            <div class="text-danger">
+                                {{ $errors->get('text_task_status')[0] }}
+                            </div>
+                        @enderror
                     </div>
 
                     <div class="mb-3 text-center">

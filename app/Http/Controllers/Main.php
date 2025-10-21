@@ -125,17 +125,18 @@ class Main extends Controller
         return redirect()->route('index');
     }
 
-    public function edit_task($id) {
-        try{
+    public function edit_task($id)
+    {
+        try {
             $id = Crypt::decrypt($id);
-        }catch(\Exception $error){
+        } catch (\Exception $error) {
             return redirect()->route('index');
         }
 
         $model = new TaskModel();
         $task = $model->where('id', '=', $id)->first();
 
-        if(empty($task)){
+        if (empty($task)) {
             return redirect()->route('index');
         }
 
@@ -147,9 +148,55 @@ class Main extends Controller
         return view('edit_task_frm', $data);
     }
 
-    public function edit_task_submit(Request $request) {
-        echo '<pre>';
-        print_r($request->all());
+    public function edit_task_submit(Request $request)
+    {
+        $request->validate([
+            'text_task_name' => 'required|min:3|max:200',
+            'text_task_description' => 'required|min:3|max:1000',
+            'text_task_status' => 'required'
+        ], [
+            'text_task_name.required' => 'O campo é obrigatório',
+            'text_task_name.min' => 'O campo deve conter no mínimo :min caracteres',
+            'text_task_name.max' => 'O campo deve conter no máximo :max caracteres',
+
+            'text_task_description.required' => 'O campo é obrigatório',
+            'text_task_description.min' => 'O campo deve conter no mínimo :min caracteres',
+            'text_task_description.max' => 'O campo deve conter no máximo :max caracteres',
+
+            'text_task_status.required' => 'O campo é obrigatório',
+        ]);
+
+        $task_id = Crypt::decrypt($request->input('task_id'));
+        $task_name = $request->input('text_task_name');
+        $task_description = $request->input('text_task_description');
+        $task_status = $request->input('text_task_status');
+
+        $model = new TaskModel();
+        $exists = $model->where('id_user', '=', session()->get('id'))
+        ->where('task_name', '=', $task_name)
+        ->where('id', '!=', $task_id)
+        ->first();
+
+        if($exists){
+            return redirect()->route('edit_task', ['id' => Crypt::encrypt($task_id)])
+            ->with('task_error', 'Já existe uma tarefa com esse nome');
+        }
+
+
+        $model->where('id', '=', $task_id)
+        ->update([
+            'task_name' => $task_name,
+            'task_description' => $task_description,
+            'task_status' => $task_status,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        return redirect()->route('index');
+        
+    }
+
+    public function delete_task(){
+        echo 'okk';
     }
 
 
@@ -182,12 +229,9 @@ class Main extends Controller
     {
         $status_collection = [
             'new' => 'Nova',
-            'in_progress',
-            'Em progresso',
-            'cancelled',
-            'Cancelada',
-            'completed',
-            'Concluída'
+            'in_progress' => 'Em progresso',
+            'cancelled' => 'Cancelada',
+            'completed' => 'Concluída'
         ];
 
 
