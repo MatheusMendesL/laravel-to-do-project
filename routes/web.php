@@ -21,5 +21,5 @@ Route::middleware('CheckLogin')->group(function () {
     Route::post('/edit_task_submit', [Main::class, 'edit_task_submit'])->name('edit_task_submit');
 
     Route::get('/delete_task/{id}', [Main::class, 'delete_task'])->name('delete_task');
-    Route::post('/delete_task_confirm/{id}', [Main::class, 'delete_task_confirm'])->name('delete_task_confirm');
+    Route::get('/delete_task_confirm/{id}', [Main::class, 'delete_task_confirm'])->name('delete_task_confirm');
 });

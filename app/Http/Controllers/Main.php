@@ -173,30 +173,68 @@ class Main extends Controller
 
         $model = new TaskModel();
         $exists = $model->where('id_user', '=', session()->get('id'))
-        ->where('task_name', '=', $task_name)
-        ->where('id', '!=', $task_id)
-        ->first();
+            ->where('task_name', '=', $task_name)
+            ->where('id', '!=', $task_id)
+            ->whereNull('deleted_at')
+            ->first();
 
-        if($exists){
+        if ($exists) {
             return redirect()->route('edit_task', ['id' => Crypt::encrypt($task_id)])
-            ->with('task_error', 'Já existe uma tarefa com esse nome');
+                ->with('task_error', 'Já existe uma tarefa com esse nome');
         }
 
 
         $model->where('id', '=', $task_id)
-        ->update([
-            'task_name' => $task_name,
-            'task_description' => $task_description,
-            'task_status' => $task_status,
-            'updated_at' => date('Y-m-d H:i:s')
+            ->update([
+                'task_name' => $task_name,
+                'task_description' => $task_description,
+                'task_status' => $task_status,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+        return redirect()->route('index');
+    }
+
+    public function delete_task($id)
+    {
+
+        try {
+            $id = Crypt::decrypt($id);
+        } catch (\Exception $error) {
+            return redirect()->route('index');
+        }
+
+        $model = new TaskModel();
+        $task = $model->where('id', '=', $id)->first();
+
+        if (empty($task)) {
+            return redirect()->route('index');
+        }
+
+        $data = [
+            'title' => $this->title,
+            'task' => $task
+        ];
+
+        return view('delete_task', $data);
+    }
+
+    public function delete_task_confirm($id){
+        
+        $id_task = null;
+        try {
+            $id_task = Crypt::decrypt($id);
+        } catch (\Exception $error) {
+            return redirect()->route('index');
+        }
+
+
+        $model = new TaskModel();
+        $model->where('id', '=', $id_task)->update([
+            'deleted_at' => date('Y-m-d H:i:s')
         ]);
 
         return redirect()->route('index');
-        
-    }
-
-    public function delete_task(){
-        echo 'okk';
     }
 
 
