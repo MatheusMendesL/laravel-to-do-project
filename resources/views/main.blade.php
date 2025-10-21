@@ -1,7 +1,6 @@
 @extends('templates/main_layout')
 
 @section('content')
-
     <div class="container">
         <div class="row">
             <div class="col">
@@ -9,6 +8,34 @@
                     <div class="col">
                         <h4>Tarefas</h4>
                     </div>
+
+                    <div class="col-6 text-center">
+                        <form action="{{ route('search_submit') }}" method="post">
+                            @csrf
+
+                            <div class="d-flex">
+                                <input type="text" name="text_search" id="text_search" class="form-control"
+                                    placeholder="Pesquisar">
+                                <button class="btn btn-outline-primary ms-3"><i class="bi bi-search"></i></button>
+                                
+                                <span class="mx-3"></span>
+
+                                <label class="me-2 align-self-center">Estado: </label>
+                                <select name="filter" id="filter" class="form-select">
+                                    <option value="{{ Crypt::encrypt('all') }}" @selected(!empty($filter) && $filter == 'all')>Todos</option>
+                                    <option value="{{ Crypt::encrypt('new') }}" @selected(!empty($filter) && $filter == 'new')>Nova</option>
+                                    <option value="{{ Crypt::encrypt('in_progress') }}" @selected(!empty($filter) && $filter == 'in_progress')>Em progresso</option>
+                                    <option value="{{ Crypt::encrypt('cancelled') }}" @selected(!empty($filter) && $filter == 'cancelled')>Cancelada</option>
+                                    <option value="{{ Crypt::encrypt('completed') }}" @selected(!empty($filter) && $filter == 'completed')>Concluída</option>
+
+
+                                </select>
+                            </div>
+
+
+                        </form>
+                    </div>
+
                     <div class="col text-end">
                         <a href="{{ route('new_task') }}" class="btn btn-primary"><i class="bi bi-plus-square me-2"></i>Nova
                             tarefa</a>
@@ -36,19 +63,28 @@
         </div>
     </div>
 
-<script>
-    $(document).ready(function(){
-        $('#table_tasks').DataTable({
-            data: @json($tasks),
-            columns: [
-                {data: 'task_name'},
-                {data: 'task_status'},
-                {data: 'task_actions'}
-            ]
+    <script>
+        $(document).ready(function() {
+            $('#table_tasks').DataTable({
+                data: @json($tasks),
+                columns: [{
+                        data: 'task_name'
+                    },
+                    {
+                        data: 'task_status'
+                    },
+                    {
+                        data: 'task_actions'
+                    }
+                ]
+            })
         })
-    })
-</script>
 
+        let filter = document.querySelector('#filter')
+
+        filter.addEventListener("change", (e) => {
+            let value = filter.value
+            window.location.href = "{{ url('/filter') }}" + '/' + value
+        })
+    </script>
 @endsection
-
-

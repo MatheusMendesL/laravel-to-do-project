@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Main;
 
@@ -22,4 +21,8 @@ Route::middleware('CheckLogin')->group(function () {
 
     Route::get('/delete_task/{id}', [Main::class, 'delete_task'])->name('delete_task');
     Route::get('/delete_task_confirm/{id}', [Main::class, 'delete_task_confirm'])->name('delete_task_confirm');
+
+    Route::post('/search_submit', [Main::class, 'search_submit'])->name('search_submit');
+    
+    Route::get('/filter/{filter}', [Main::class, 'filter'])->name('filter');
 });

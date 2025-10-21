@@ -16,9 +16,31 @@ class Main extends Controller
     {
         $data = [
             'title' => 'Gestor de Tarefas',
-            'datatables' => true,
-            'tasks' => $this->_get_tasks(),
+            'datatables' => true
         ];
+
+        if (!empty(session('search'))) {
+            $data['search'] = session('search');
+            $data['tasks'] = $this->_get_tasks(session('tasks'));
+
+            session()->forget('search');
+            session()->forget('tasks');
+        } else if (session('filter')) {
+
+            $data['filter'] = session('filter');
+            $data['tasks'] = $this->_get_tasks(session('tasks'));
+
+            session()->forget('filter');
+            session()->forget('tasks');
+        } else {
+            $model = new TaskModel();
+            $tasks = $model->where('id_user', '=', session('id'))
+                ->whereNull('deleted_at')
+                ->get();
+            $data['tasks'] = $this->_get_tasks($tasks);
+        }
+
+
 
         return view('main', $data);
     }
@@ -219,8 +241,9 @@ class Main extends Controller
         return view('delete_task', $data);
     }
 
-    public function delete_task_confirm($id){
-        
+    public function delete_task_confirm($id)
+    {
+
         $id_task = null;
         try {
             $id_task = Crypt::decrypt($id);
@@ -237,16 +260,66 @@ class Main extends Controller
         return redirect()->route('index');
     }
 
+    // search tasks
+
+    public function search_submit(Request $request)
+    {
+        $search = $request->input('text_search');
+
+        $model = new TaskModel();
+        if ($search == '') {
+            $tasks = $model->where('id_user', '=', session("id"))
+                ->whereNull('deleted_at')
+                ->get();
+        } else {
+            $tasks = $model
+                ->where('id_user', '=', session("id"))
+                ->whereNull('deleted_at')
+                ->where(function ($query) use ($search) {
+                    $query->where('task_name', 'like', '%' . $search . '%')
+                        ->orWhere('task_description', 'like', '%' . $search . '%');
+                })
+                ->get();
+        }
+
+        session()->put('tasks', $tasks);
+        session()->put('search', $search);
+
+        return redirect()->route("index");
+    }
+
+    public function filter($status)
+    {
+        try {
+            $status = Crypt::decrypt($status);
+        } catch (\Exception $error) {
+            return redirect()->route('index');
+        }
+
+        $model = new TaskModel();
+        if ($status == 'all') {
+            $tasks = $model->where("id_user", '=', session('id'))
+                ->whereNull('deleted_at')
+                ->get();
+        } else {
+            $tasks = $model->where("id_user", '=', session('id'))
+                ->where("task_status", '=', $status)
+                ->whereNull('deleted_at')
+                ->get();
+        }
+
+        session()->put('tasks', $tasks);
+        session()->put('filter', $status);
+
+        return redirect()->route("index");
+    }
+
 
     // private methods
 
-    private function _get_tasks()
+    private function _get_tasks($tasks)
     {
-        $model = new TaskModel();
 
-        $tasks = $model->where('id_user', '=', session()->get('id'))
-            ->whereNull('deleted_at')
-            ->get();
         $collection = [];
         foreach ($tasks as $task) {
 
