@@ -1,7 +1,7 @@
 @extends('templates/main_layout')
 
 @section('content')
-    <div class="container">
+    <div class="container mb-3">
         <div class="row">
             <div class="col">
                 <div class="row align-items-center mb-3">
@@ -71,10 +71,12 @@
                         data: 'task_name'
                     },
                     {
-                        data: 'task_status'
+                        data: 'task_status',
+                        className: 'text-center align-middle'
                     },
                     {
-                        data: 'task_actions'
+                        data: 'task_actions',
+                        className: 'text-center align-middle'
                     }
                 ]
             })

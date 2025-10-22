@@ -25,6 +25,7 @@ class Main extends Controller
 
             session()->forget('search');
             session()->forget('tasks');
+
         } else if (session('filter')) {
 
             $data['filter'] = session('filter');
@@ -134,7 +135,10 @@ class Main extends Controller
             ->first();
 
         if ($task) {
-            return redirect()->route('new_task')->with('task_error', 'Já existe uma tarefa com esse nome');
+            return redirect()
+            ->route('new_task')
+            ->withInput()
+            ->with('task_error', 'Já existe uma tarefa com esse nome');
         }
 
         $model->id_user = session()->get('id');
@@ -327,8 +331,8 @@ class Main extends Controller
             $link_delete = '<a href="' . route('delete_task', ['id' => Crypt::encrypt($task->id)]) . '" class="btn btn-danger"><i class="bi bi-trash"></i></a>';
 
             $collection[] = [
-                'task_name' => $task->task_name,
-                'task_status' => $this->status_name($task->task_status),
+                'task_name' => '<span class="task-title">' . $task->task_name . '</span><br><small class="opacity-50">' . $task->task_description .  '</small>',
+                'task_status' => $this->_status_name($task->task_status),
                 'task_actions' => $link_edit . $link_delete
             ];
         }
@@ -336,7 +340,7 @@ class Main extends Controller
         return $collection;
     }
 
-    private function status_name($status)
+    private function _status_name($status)
     {
         $status_collection = [
             'new' => 'Nova',
@@ -347,7 +351,23 @@ class Main extends Controller
 
 
         if (key_exists($status, $status_collection)) {
+            return '<span class="' . $this->_status_badge($status) . '">' . $status_collection[$status] . '</span>';
+        }
+    }
+
+    private function _status_badge($status)
+    {
+
+        $status_collection = [
+            'new' => 'badge bg-primary p-2',
+            'in_progress' => 'badge bg-success p-2',
+            'cancelled' => 'badge bg-danger p-2',
+            'completed' => 'badge bg-secondary p-2'
+        ];
+
+         if (key_exists($status, $status_collection)) {
             return $status_collection[$status];
         }
+
     }
 }

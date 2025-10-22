@@ -22,7 +22,7 @@
 
                 <div class="mb-3">
                     <label for="text_task_description" class="form-label">Descrição da tarefa</label>
-                    <textarea name="text_task_description" id="text_task_description" class="form-control" cols="30" rows="5" value="{{ old('text_task_description') }}" required></textarea>
+                    <textarea name="text_task_description" id="text_task_description" class="form-control" cols="30" rows="5" required>{{ old('text_task_description') }}</textarea>
                     @error('text_task_description')
                         <div class="text-danger">
                             {{ $errors->get('text_task_description')[0] }}
